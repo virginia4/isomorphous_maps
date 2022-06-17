@@ -1,0 +1,21 @@
+package:
+  name: stat_ded
+  version: 1.0
+
+source:
+  path: /Users/vapostolop/Desktop/scripts/statist_DEDmaps_project/stat_ded/stat_ded
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+
+test:
+  imports: 
+    - stat_ded
+
+about:
+  home:
