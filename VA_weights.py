@@ -3,9 +3,23 @@ from __future__ import absolute_import, division, print_function
 import argparse
 import numpy as np
 import pandas as pd
+import sys
+import os.path
 
+
+save_path = '/Users/vapostolop/Desktop/photolyase_beamtime/mtz_2770/'
+name_of_mtz_map_file = input("What is the name of the map file: ")
+
+if not os.path.exists('MAPs'):
+    new_save_path = os.path.join(save_path, 'MAPs')
+    os.makedirs(new_save_path)
+    completeName_mtz = os.path.join(new_save_path, name_of_mtz_map_file)  
+
+
+completeName_mtz = os.path.join(save_path, name_of_mtz_map_file) 
+sys.path.append("/Users/vapostolop/Desktop/scripts/statist_DEDmaps_project/stat_ded/")
 # import stat_ded.structure_factors_from_data, stat_ded.scaling, stat_ded.weights
-from stat_ded.kk import structure_factors_from_data
+from stat_ded.structure_factors_from_data import *
 from stat_ded.scaling import *
 from  stat_ded.weights import *
 
@@ -13,7 +27,7 @@ from  stat_ded.weights import *
 def main():
 
     """
-    Author: Virginia Apostolopopoulou, virginia.apostolopoulou@cfel.de
+    Author: Virginia Apostolopoulou, virginia.apostolopoulou@cfel.de
 
     Code to calculate  difference structure factors and weights for
     isomorphous difference maps (FLIGHT_obs - FDARK_obs).
@@ -58,6 +72,15 @@ def main():
         action="store",
         choices=["no_weights", "q_weights", "Zhong_weights"],
         help="options: no_weights, q_weights (default), Zhong_weights",
+    )
+
+    parser.add_argument(
+        "--alpha",
+        default=1.0,
+        type=float,
+        nargs="?",
+        action="store",
+        help="scalign weights using the alpha parameters",
     )
 
     parser.add_argument(
@@ -106,6 +129,7 @@ def main():
     print("Resolution max cut off:", args.res_max)
     print("Resolution min cut off:", args.res_min)
     print("Scaling F_obs to F_calc:", args.scaling)
+    print("alpha paramter (used only in q-weights method):", args.alpha)
 
     res_cutoff_max = args.res_max
     res_cutoff_min = args.res_min
@@ -178,8 +202,10 @@ def main():
     df_all.loc[(df_all["PHI_D"] > 180.0), "PHI_D"] = df_all["PHI_D"] - 360.0
 
     calculate_weights(
+        completeName_mtz,
         args.w_method,
         BDC,
+        args.alpha, 
         df_all,
         F_LIGHT_scaled,
         F_DARK_scaled,
